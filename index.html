@@ -13,15 +13,13 @@
                 Deform a source mesh to form a target mesh using 3D loss functions</a><br>
         </div>
 
-		<div style="position:absolute; top: 15%; left: 50%;">
-			<p id="modelNum">iter #0</p>
-		</div>
+		<div style="position:absolute; top: 15%; left: 50%;"><p id="modelNum">iter #0</p></div>
 		
 		<script src="scoreoutputer.min.js"></script>
 		<script>
 			// 建構子 ScoreOutputer 接受一個字串，該字串為 csv 的檔案名稱
 			// 以下面範例，檔名就為 "109598105(總分: 6).csv"
-			var so = new ScoreOutputer("109598105");
+			var so = new ScoreOutputer("107590049");
 			so.installCSS(function(){
 				// 安裝 bootstrap 的 css，如果在 html 上方引用 bootstrap 5.1.1 的話就不用使用 installCSS ，注意一定要 bootstrap css 5.1.1 版
 				// installCSS 接收一個 callback 當作參數，作為成功安裝 bootstrap css 的回呼函式
@@ -34,8 +32,8 @@
 				//addChild 要比 renderModal 先呼叫
 				so.addChild("場景顯示目標模型", 1, true);
 				so.addChild("場景顯示成果模型", 1, true);
-				so.addChild("執行pytorch3D程式碼產生25個模型", 2, false);
-				so.addChild("可拖動GUI顯示不同階段模型", 3, false);
+				so.addChild("執行pytorch3D程式碼產生25個模型", 2, true);
+				so.addChild("可拖動GUI顯示不同階段模型", 3, true);
 				so.addChild("可更換其他模型", 3, false);
 		
 				//產生自評表，參數如下所示
@@ -50,7 +48,7 @@
 					//4. 自評表文字大小 (預設 14pt)
 					'15pt', 
 					//5. 自評表 checkbox 文字大小 (預設多少忘了)
-					'15px', 
+					'20px', 
 					//6. 自評表標題 (預設 "自我評分表")
 					dialogTitle='自我評分表'
 				);
@@ -141,7 +139,8 @@
 				const material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
 				
 				// Load models of pytorch3d 
-				models.forEach (element =>  loader.load( './models/dolphin/model_'+element.toString()+'.ply',function ( geometry ) {
+				models.forEach (element =>  loader.load( './models/dolphin/model_'+element.toString()+'.ply',
+				function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
@@ -160,21 +159,7 @@
 					const gui = new GUI();
 					gui.add( effectController, 'step',1,models.length,1).onChange(iterChanger);
 
-					const effectController = { step: 1};
-					let currentIter = effectController.step;
-					function iterChanger(){
-						if(currentIter===effectController.step) return;
-						currentIter = effectController.step;
-						var textTag = document.getElementById('modelNum');
-						textTag.innerText = "iter #"+models[currentIter-1].toString();
-						for(let i=0; i<models.length; i++){
-							let item = scene.getObjectByName(models[i]);
-							if(i!==currentIter-1 && item.visible===true)
-								item.visible = false;
-							else if (i===currentIter-1)
-								item.visible = true;
-						}
-					}
+				
                 } ));
 				
 				
@@ -203,7 +188,21 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
-
+			const effectController = { step: 1};
+			let currentIter = effectController.step;
+			function iterChanger(){
+				if(currentIter===effectController.step) return;
+				currentIter = effectController.step;
+				var textTag = document.getElementById('modelNum');
+				textTag.innerText = "iter #"+models[currentIter-1].toString();
+				for(let i=0; i<models.length; i++){
+					let item = scene.getObjectByName(models[i]);
+					if(i!==currentIter-1 && item.visible===true)
+						item.visible = false;
+					else if (i===currentIter-1)
+						item.visible = true;
+				}
+			}
             
 			function addShadowedLight( x, y, z, color, intensity ) {
 
